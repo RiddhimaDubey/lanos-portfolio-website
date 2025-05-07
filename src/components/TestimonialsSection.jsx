@@ -1,330 +1,241 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuoteLeft, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { useRef, useEffect, useState } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 
 const TestimonialsSection = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
-  const intervalRef = useRef(null);
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   
+  // Testimonial carousel state
+  const [[currentTestimonial, direction], setCurrentTestimonial] = useState([0, 0]);
   const testimonials = [
     {
-      name: "Rahul Sharma",
-      position: "Student, IIT Bombay",
-      text: "Lanos's gamified learning platform completely transformed my approach to learning complex programming concepts. The interactive challenges and real-world applications made it engaging and effective.",
-      image: "/src/assets/images/testimonial1.jpg"
+      text: "Lanos Institute has completely transformed our approach to technical training. Their gamified learning platform has increased engagement and knowledge retention among our team by over 40%.",
+      author: "Sarah Johnson",
+      position: "CTO, TechVision Inc."
     },
     {
-      name: "Priya Patel",
-      position: "HR Director, TechSolutions India",
-      text: "We partnered with Lanos for our employee training program, and the results have been outstanding. Their customized curriculum and innovative teaching methods have significantly improved our team's technical capabilities.",
-      image: "/src/assets/images/testimonial2.jpg"
+      text: "The research collaboration with Lanos has been instrumental in developing our new AI-driven educational tools. Their expertise and innovative thinking have accelerated our product development significantly.",
+      author: "Michael Chen",
+      position: "Head of Innovation, EduTech Solutions"
     },
     {
-      name: "Dr. Amit Kumar",
-      position: "Professor, Delhi University",
-      text: "The curriculum design services provided by Lanos have helped us modernize our computer science program. Their deep understanding of industry needs and educational methodologies is impressive.",
-      image: "/src/assets/images/testimonial3.jpg"
+      text: "As someone who struggled with traditional learning methods, Lanos' approach was a revelation. Their interactive modules made complex programming concepts accessible and even enjoyable.",
+      author: "Priya Sharma",
+      position: "Software Engineer & Former Student"
+    },
+    {
+      text: "Partnering with Lanos for our corporate training needs has yielded exceptional results. Our employees are more engaged and better equipped to handle technological challenges.",
+      author: "Robert Williams",
+      position: "HR Director, Global Systems"
     }
   ];
 
-  useEffect(() => {
-    // Auto-rotate testimonials
-    intervalRef.current = setInterval(() => {
-      nextTestimonial();
-    }, 5000);
-    
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [currentIndex]);
-
-  const nextTestimonial = () => {
-    setDirection(1);
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  const paginate = (newDirection) => {
+    const nextIndex = (currentTestimonial + newDirection + testimonials.length) % testimonials.length;
+    setCurrentTestimonial([nextIndex, newDirection]);
   };
 
-  const prevTestimonial = () => {
-    setDirection(-1);
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
-  };
-
-  const variants = {
+  const testimonialVariants = {
     enter: (direction) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction > 0 ? 500 : -500,
+      opacity: 0,
+      position: "absolute"
     }),
     center: {
       x: 0,
-      opacity: 1
+      opacity: 1,
+      position: "relative"
     },
     exit: (direction) => ({
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction < 0 ? 500 : -500,
+      opacity: 0,
+      position: "absolute"
     })
+  };
+  
+  // Auto-advance testimonials
+  useEffect(() => {
+    const autoAdvanceInterval = setInterval(() => {
+      paginate(1);
+    }, 5000); // Change testimonial every 5 seconds
+    
+    return () => clearInterval(autoAdvanceInterval);
+  }, [currentTestimonial]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
   };
 
   return (
-    <section id="testimonials" style={{ padding: '8rem 0', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
+    <section ref={sectionRef} id="testimonials" style={{ padding: '8rem 0' }}>
       <div className="container">
-        <h2 className="section-title">Building Trust</h2>
-        
-        <div style={{ 
-          position: 'relative',
-          maxWidth: '900px',
-          margin: '4rem auto 0',
-          height: '350px'
-        }}>
-          <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-              key={currentIndex}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          style={{ textAlign: 'center' }}
+        >
+          <h2 className="section-title">What People Say About Us</h2>
+          
+          <div className="testimonial-carousel" style={testimonialCarouselStyle}>
+            {/* Left navigation button */}
+            <button 
+              onClick={() => paginate(-1)}
               style={{
+                ...carouselButtonStyle,
                 position: 'absolute',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                left: '-25px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10
               }}
+              aria-label="Previous testimonial"
             >
-              <div style={{
-                backgroundColor: 'rgba(30, 30, 30, 0.6)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '10px',
-                padding: '3rem',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative'
-              }}>
-                <FontAwesomeIcon 
-                  icon={faQuoteLeft} 
-                  style={{ 
-                    fontSize: '3rem', 
-                    color: 'rgba(0, 194, 255, 0.2)',
-                    position: 'absolute',
-                    top: '2rem',
-                    left: '2rem'
-                  }} 
-                />
-                
-                <p style={{ 
-                  fontSize: '1.2rem', 
-                  lineHeight: '1.8',
-                  marginBottom: '2rem',
-                  zIndex: 1
-                }}>
-                  "{testimonials[currentIndex].text}"
-                </p>
-                
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  marginTop: 'auto'
-                }}>
-                  <div style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(0, 194, 255, 0.2)',
-                    marginRight: '1rem',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    overflow: 'hidden'
-                  }}>
-                    {/* Placeholder for testimonial image */}
-                    <span style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: 'bold',
-                      color: 'var(--accent-color)'
-                    }}>
-                      {testimonials[currentIndex].name.charAt(0)}
-                    </span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '-15px' }}>
+                <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            
+            <div className="testimonial-container" style={testimonialContainerStyle}>
+              <AnimatePresence initial={false} custom={direction}>
+                <motion.div
+                  key={currentTestimonial}
+                  custom={direction}
+                  variants={testimonialVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "tween", duration: 0.3 },
+                    opacity: { duration: 0.2 }
+                  }}
+                  className="testimonial"
+                  style={testimonialStyle}
+                >
+                  <div className="testimonial-content" style={testimonialContentStyle}>
+                    <div className="quote-icon" style={quoteIconStyle}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 11L7 16H5L7 11H5V7H10V11ZM18 11L15 16H13L15 11H13V7H18V11Z" fill="#00c2ff" />
+                      </svg>
+                    </div>
+                    <p style={testimonialTextStyle}>{testimonials[currentTestimonial].text}</p>
+                    <div style={testimonialAuthorStyle}>
+                      <h4>{testimonials[currentTestimonial].author}</h4>
+                      <p>{testimonials[currentTestimonial].position}</p>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <h4 style={{ margin: 0, marginBottom: '0.2rem' }}>
-                      {testimonials[currentIndex].name}
-                    </h4>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-color-muted)' }}>
-                      {testimonials[currentIndex].position}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          
-          {/* Navigation buttons */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={prevTestimonial}
-            style={{
-              position: 'absolute',
-              left: '-20px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              border: 'none',
-              cursor: 'pointer',
-              zIndex: 2
-            }}
-          >
-            <FontAwesomeIcon icon={faChevronLeft} />
-          </motion.button>
-          
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={nextTestimonial}
-            style={{
-              position: 'absolute',
-              right: '-20px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: 'white',
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              border: 'none',
-              cursor: 'pointer',
-              zIndex: 2
-            }}
-          >
-            <FontAwesomeIcon icon={faChevronRight} />
-          </motion.button>
-          
-          {/* Dots indicator */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            position: 'absolute',
-            bottom: '-30px',
-            width: '100%',
-            gap: '10px'
-          }}>
-            {testimonials.map((_, index) => (
-              <motion.div
-                key={index}
-                onClick={() => {
-                  setDirection(index > currentIndex ? 1 : -1);
-                  setCurrentIndex(index);
-                }}
-                style={{
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  backgroundColor: currentIndex === index ? 'var(--accent-color)' : 'rgba(255, 255, 255, 0.3)',
-                  cursor: 'pointer'
-                }}
-                whileHover={{ scale: 1.2 }}
-              />
-            ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            
+            {/* Right navigation button */}
+            <button 
+              onClick={() => paginate(1)}
+              style={{
+                ...carouselButtonStyle,
+                position: 'absolute',
+                right: '-25px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10
+              }}
+              aria-label="Next testimonial"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '-15px' }}>
+                <path d="M9 6L15 12L9 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
-        </div>
-        
-        {/* Team Section */}
-        <div style={{ marginTop: '8rem' }}>
-          <h3 style={{ 
-            fontSize: '1.8rem', 
-            textAlign: 'center',
-            marginBottom: '3rem'
-          }}>
-            Meet Our Team
-          </h3>
-          
-          <div className="grid" style={{ 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '2rem'
-          }}>
-            {[
-              { name: "Aditya Sharma", position: "Founder & CEO", image: "/src/assets/images/team1.jpg" },
-              { name: "Neha Gupta", position: "CTO", image: "/src/assets/images/team2.jpg" },
-              { name: "Vikram Singh", position: "Head of R&D", image: "/src/assets/images/team3.jpg" },
-              { name: "Ananya Patel", position: "Lead EdTech Designer", image: "/src/assets/images/team4.jpg" }
-            ].map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                style={{
-                  backgroundColor: 'rgba(30, 30, 30, 0.6)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  height: '100%'
-                }}
-                whileHover={{
-                  y: -10,
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
-                }}
-              >
-                <div style={{
-                  height: '250px',
-                  backgroundColor: 'rgba(0, 194, 255, 0.1)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  {/* Placeholder for team member image */}
-                  <div style={{
-                    width: '120px',
-                    height: '120px',
-                    borderRadius: '50%',
-                    backgroundColor: index % 2 === 0 ? 'rgba(0, 194, 255, 0.3)' : 'rgba(255, 62, 108, 0.3)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
-                    <span style={{ 
-                      fontSize: '2.5rem', 
-                      fontWeight: 'bold',
-                      color: index % 2 === 0 ? 'var(--accent-color)' : 'var(--accent-color-alt)'
-                    }}>
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                </div>
-                
-                <div style={{ padding: '1.5rem', textAlign: 'center' }}>
-                  <h4 style={{ marginBottom: '0.5rem' }}>{member.name}</h4>
-                  <p style={{ color: 'var(--text-color-muted)', margin: 0 }}>{member.position}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
+};
+
+// Testimonial carousel styles
+const testimonialCarouselStyle = {
+  width: '100%',
+  maxWidth: '800px',
+  marginTop: '3rem',
+  position: 'relative',
+  overflow: 'visible',
+  margin: '3rem auto 0'
+};
+
+const testimonialContainerStyle = {
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '2rem 0',
+  minHeight: '300px', // Set a fixed height to prevent layout shifts
+  overflow: 'hidden' // Hide overflow content during transitions
+};
+
+const testimonialStyle = {
+  width: '100%',
+  maxWidth: '800px',
+  top: 0,
+  left: 0,
+  right: 0
+};
+
+const testimonialContentStyle = {
+  backgroundColor: 'rgba(30, 30, 30, 0.6)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '10px',
+  padding: '3rem',
+  textAlign: 'center',
+  border: '1px solid rgba(255, 255, 255, 0.05)',
+  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+  position: 'relative'
+};
+
+const quoteIconStyle = {
+  position: 'absolute',
+  top: '1.5rem',
+  left: '1.5rem',
+  opacity: 0.5
+};
+
+const testimonialTextStyle = {
+  fontSize: '1.1rem',
+  lineHeight: '1.8',
+  marginBottom: '2rem',
+  fontStyle: 'italic'
+};
+
+const testimonialAuthorStyle = {
+  marginTop: '1.5rem'
+};
+
+const carouselButtonStyle = {
+  width: '50px',
+  height: '50px',
+  borderRadius: '50%',
+  backgroundColor: 'rgba(0, 194, 255, 0.2)',
+  border: 'none',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease',
+  ':hover': {
+    backgroundColor: 'rgba(0, 194, 255, 0.4)'
+  }
 };
 
 export default TestimonialsSection;
