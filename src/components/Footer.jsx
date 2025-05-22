@@ -1,7 +1,23 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faLinkedin, faInstagram, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { 
+  faBook, 
+  faGraduationCap, 
+  faBuilding, 
+  faUsers, 
+  faGamepad, 
+  faChalkboardTeacher, 
+  faHandshake, 
+  faBookOpen, 
+  faFlask 
+} from '@fortawesome/free-solid-svg-icons';
+import { 
+  faFacebook, 
+  faTwitter, 
+  faLinkedin, 
+  faInstagram 
+} from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope, faPhone, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
 const Footer = () => {
@@ -23,6 +39,26 @@ const Footer = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
+
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    const target = document.getElementById(href.replace('#', ''));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      // Close mobile menu if it's open (handled by header component)
+      window.dispatchEvent(new CustomEvent('closeMobileMenu'));
+    }
+  };
+
+  const quickLinks = [
+    { name: 'Home', href: '#hero' },
+    { name: 'About', href: '#about' },
+    { name: 'Services', href: '#services' },
+    { name: 'Benefits', href: '#benefits' },
+    { name: 'Team', href: '#team' },
+    { name: 'Insights', href: '#insights' },
+    { name: 'Contact', href: '#contact' }
+  ];
 
   return (
     <motion.footer
@@ -55,8 +91,8 @@ const Footer = () => {
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon hoverable">
                 <FontAwesomeIcon icon={faInstagram} style={socialIconStyle} />
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-icon hoverable">
-                <FontAwesomeIcon icon={faGithub} style={socialIconStyle} />
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon hoverable">
+                <FontAwesomeIcon icon={faFacebook} style={socialIconStyle} />
               </a>
             </div>
           </motion.div>
@@ -65,48 +101,115 @@ const Footer = () => {
           <motion.div variants={itemVariants}>
             <h3>Quick Links</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
-              <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/" className="animated-link">Home</Link>
-              </li>
-              <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/about" className="animated-link">About Us</Link>
-              </li>
-              <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/services" className="animated-link">Services</Link>
-              </li>
-              <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/research" className="animated-link">Research</Link>
-              </li>
-              <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/contact" className="animated-link">Contact</Link>
-              </li>
+              {quickLinks.map((link) => (
+                <li key={link.name} style={{ marginBottom: '0.8rem' }}>
+                  <a 
+                    href={link.href} 
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="animated-link"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
-          {/* Services */}
+          {/* Important Links */}
           <motion.div variants={itemVariants}>
-            <h3>Our Services</h3>
+            <h3>Important Links</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/services" className="animated-link">Gamified Learning Platform</Link>
+                <Link 
+                  to="/gamified-learning" 
+                  className="animated-link"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    color: 'var(--text-color)',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  <FontAwesomeIcon icon={faGamepad} style={{ color: 'var(--accent-color)' }} />
+                  Gamified Learning Platform
+                </Link>
               </li>
               <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/services" className="animated-link">Enterprise Training</Link>
+                <Link 
+                  to="/enterprise-training" 
+                  className="animated-link"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    color: 'var(--text-color)',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  <FontAwesomeIcon icon={faBuilding} style={{ color: 'var(--accent-color)' }} />
+                  Enterprise Training
+                </Link>
               </li>
               <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/services" className="animated-link">Consulting Services</Link>
+                <Link 
+                  to="/consulting-services" 
+                  className="animated-link"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    color: 'var(--text-color)',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  <FontAwesomeIcon icon={faHandshake} style={{ color: 'var(--accent-color)' }} />
+                  Consulting Services
+                </Link>
               </li>
               <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/services" className="animated-link">Curriculum Design</Link>
+                <Link 
+                  to="/curriculum-design" 
+                  className="animated-link"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    color: 'var(--text-color)',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  <FontAwesomeIcon icon={faBook} style={{ color: 'var(--accent-color)' }} />
+                  Curriculum Design
+                </Link>
               </li>
               <li style={{ marginBottom: '0.8rem' }}>
-                <Link to="/research" className="animated-link">R&D Innovations</Link>
+                <Link 
+                  to="/rd-innovations" 
+                  className="animated-link"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.8rem',
+                    textDecoration: 'none',
+                    color: 'var(--text-color)',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  <FontAwesomeIcon icon={faFlask} style={{ color: 'var(--accent-color)' }} />
+                  R&D Innovations
+                </Link>
               </li>
             </ul>
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants} id="contact">
             <h3>Contact Us</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               <li style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
